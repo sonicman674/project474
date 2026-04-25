@@ -1,0 +1,80 @@
+Last login: Sat Apr 25 18:09:29 on ttys007
+robertstacey@Roberts-MacBook-Pro-2 Anomaly-Transformer-robtest % source venv/bin/activate
+(venv) robertstacey@Roberts-MacBook-Pro-2 Anomaly-Transformer-robtest % bash ./scripts/GECCO.sh
+------------ Options -------------
+anormly_ratio: 1.0
+batch_size: 256
+data_path: dataset/GECCO
+dataset: GECCO
+input_c: 9
+k: 3
+lr: 0.0001
+mode: train
+model_save_path: checkpoints
+num_epochs: 10
+output_c: 9
+pretrained_model: None
+win_size: 100
+-------------- End ----------------
+======================TRAIN MODE======================
+Epoch: 1 cost time: 5.499937057495117
+Epoch: 1, Steps: 4 | Train Loss: -22.5753102 Vali Loss: -18.0241375 
+Validation loss decreased (inf --> -18.024137).  Saving model ...
+Updating learning rate to 0.0001
+Epoch: 2 cost time: 5.340051889419556
+Epoch: 2, Steps: 4 | Train Loss: -22.3370547 Vali Loss: -18.3513045 
+Validation loss decreased (-18.024137 --> -18.351305).  Saving model ...
+Updating learning rate to 5e-05
+Epoch: 3 cost time: 5.726245164871216
+Epoch: 3, Steps: 4 | Train Loss: -22.2642250 Vali Loss: -18.4145536 
+Validation loss decreased (-18.351305 --> -18.414554).  Saving model ...
+Updating learning rate to 2.5e-05
+Epoch: 4 cost time: 5.308401346206665
+Epoch: 4, Steps: 4 | Train Loss: -22.3373861 Vali Loss: -18.3994122 
+EarlyStopping counter: 1 out of 3
+Updating learning rate to 1.25e-05
+Epoch: 5 cost time: 5.034197092056274
+Epoch: 5, Steps: 4 | Train Loss: -22.4280949 Vali Loss: -18.4074450 
+EarlyStopping counter: 2 out of 3
+Updating learning rate to 6.25e-06
+Epoch: 6 cost time: 5.566514015197754
+Epoch: 6, Steps: 4 | Train Loss: -22.4718528 Vali Loss: -18.4181633 
+Validation loss decreased (-18.414554 --> -18.418163).  Saving model ...
+Updating learning rate to 3.125e-06
+Epoch: 7 cost time: 5.430377960205078
+Epoch: 7, Steps: 4 | Train Loss: -22.5093822 Vali Loss: -18.4248195 
+EarlyStopping counter: 1 out of 3
+Updating learning rate to 1.5625e-06
+Epoch: 8 cost time: 4.976091146469116
+Epoch: 8, Steps: 4 | Train Loss: -22.5128741 Vali Loss: -18.4284878 
+EarlyStopping counter: 2 out of 3
+Updating learning rate to 7.8125e-07
+Epoch: 9 cost time: 5.007321119308472
+Epoch: 9, Steps: 4 | Train Loss: -22.5343022 Vali Loss: -18.4304895 
+EarlyStopping counter: 3 out of 3
+Early stopping
+------------ Options -------------
+anormly_ratio: 1.0
+batch_size: 256
+data_path: dataset/GECCO
+dataset: GECCO
+input_c: 9
+k: 3
+lr: 0.0001
+mode: test
+model_save_path: checkpoints
+num_epochs: 10
+output_c: 9
+pretrained_model: None
+win_size: 100
+-------------- End ----------------
+======================TEST MODE======================
+/Users/robertstacey/Downloads/Anomaly-Transformer-robtest/venv/lib/python3.14/site-packages/torch/nn/modules/loss.py:44: UserWarning: size_average and reduce args will be deprecated, please use reduction='none' instead.
+  self.reduction: str = _Reduction.legacy_get_string(size_average, reduce)
+Threshold : 0.050760612
+pred:    (41800,)
+gt:      (41800,)
+pred:  (41800,)
+gt:    (41800,)
+Accuracy : 0.9868, Precision : 0.1222, Recall : 1.0000, F-score : 0.2178 
+(venv) robertstacey@Roberts-MacBook-Pro-2 Anomaly-Transformer-robtest % 

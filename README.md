@@ -50,3 +50,7 @@ url={https://openreview.net/forum?id=LzQQ89U1qm_}
 
 ## Contact
 If you have any question, please contact wuhx23@mails.tsinghua.edu.cn.
+
+
+cd /Users/robertstacey/Downloads/Anomaly-Transformer-robtest
+source venv/bin/activate

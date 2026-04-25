@@ -1,0 +1,82 @@
+(venv) robertstacey@Roberts-MacBook-Pro-2 Anomaly-Transformer-robtest % bash ./scripts/SKAB.sh                                      
+------------ Options -------------
+anormly_ratio: 1.0
+batch_size: 128
+data_path: dataset/SKAB
+dataset: SKAB
+input_c: 8
+k: 3
+lr: 0.0001
+mode: train
+model_save_path: checkpoints
+num_epochs: 10
+output_c: 8
+pretrained_model: None
+win_size: 100
+-------------- End ----------------
+======================TRAIN MODE======================
+Epoch: 1 cost time: 0.8837580680847168
+Epoch: 1, Steps: 1 | Train Loss: -22.2389545 Vali Loss: 805.3214518 
+Validation loss decreased (inf --> 805.321452).  Saving model ...
+Updating learning rate to 0.0001
+Epoch: 2 cost time: 0.20049095153808594
+Epoch: 2, Steps: 1 | Train Loss: -22.5554104 Vali Loss: 797.6160889 
+Validation loss decreased (805.321452 --> 797.616089).  Saving model ...
+Updating learning rate to 5e-05
+Epoch: 3 cost time: 0.17481708526611328
+Epoch: 3, Steps: 1 | Train Loss: -22.5063400 Vali Loss: 793.5858765 
+Validation loss decreased (797.616089 --> 793.585876).  Saving model ...
+Updating learning rate to 2.5e-05
+Epoch: 4 cost time: 0.19774913787841797
+Epoch: 4, Steps: 1 | Train Loss: -22.4187164 Vali Loss: 791.5722656 
+Validation loss decreased (793.585876 --> 791.572266).  Saving model ...
+Updating learning rate to 1.25e-05
+Epoch: 5 cost time: 0.17264795303344727
+Epoch: 5, Steps: 1 | Train Loss: -22.3775387 Vali Loss: 790.5826111 
+Validation loss decreased (791.572266 --> 790.582611).  Saving model ...
+Updating learning rate to 6.25e-06
+Epoch: 6 cost time: 0.16962003707885742
+Epoch: 6, Steps: 1 | Train Loss: -22.3601170 Vali Loss: 790.0979207 
+Validation loss decreased (790.582611 --> 790.097921).  Saving model ...
+Updating learning rate to 3.125e-06
+Epoch: 7 cost time: 0.17156481742858887
+Epoch: 7, Steps: 1 | Train Loss: -22.3526287 Vali Loss: 789.8600057 
+Validation loss decreased (790.097921 --> 789.860006).  Saving model ...
+Updating learning rate to 1.5625e-06
+Epoch: 8 cost time: 0.1694169044494629
+Epoch: 8, Steps: 1 | Train Loss: -22.3493176 Vali Loss: 789.7430929 
+Validation loss decreased (789.860006 --> 789.743093).  Saving model ...
+Updating learning rate to 7.8125e-07
+Epoch: 9 cost time: 0.16918587684631348
+Epoch: 9, Steps: 1 | Train Loss: -22.3478146 Vali Loss: 789.6854553 
+Validation loss decreased (789.743093 --> 789.685455).  Saving model ...
+Updating learning rate to 3.90625e-07
+Epoch: 10 cost time: 0.16941118240356445
+Epoch: 10, Steps: 1 | Train Loss: -22.3471241 Vali Loss: 789.6571045 
+Validation loss decreased (789.685455 --> 789.657104).  Saving model ...
+Updating learning rate to 1.953125e-07
+------------ Options -------------
+anormly_ratio: 1.0
+batch_size: 128
+data_path: dataset/SKAB
+dataset: SKAB
+input_c: 8
+k: 3
+lr: 0.0001
+mode: test
+model_save_path: checkpoints
+num_epochs: 10
+output_c: 8
+pretrained_model: None
+win_size: 100
+-------------- End ----------------
+======================TEST MODE======================
+/Users/robertstacey/Downloads/Anomaly-Transformer-robtest/venv/lib/python3.14/site-packages/torch/nn/modules/loss.py:44: UserWarning: size_average and reduce args will be deprecated, please use reduction='none' instead.
+  self.reduction: str = _Reduction.legacy_get_string(size_average, reduce)
+Threshold : 0.5162257
+pred:    (37400,)
+gt:      (37400,)
+pred:  (37400,)
+gt:    (37400,)
+Accuracy : 0.9925, Precision : 0.9791, Recall : 1.0000, F-score : 0.9894 
+(venv) robertstacey@Roberts-MacBook-Pro-2 Anomaly-Transformer-robtest % 
