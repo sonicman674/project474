@@ -31,8 +31,8 @@ class EarlyStopping:
         self.best_score = None
         self.best_score2 = None
         self.early_stop = False
-        self.val_loss_min = np.Inf
-        self.val_loss2_min = np.Inf
+        self.val_loss_min = np.inf
+        self.val_loss2_min = np.inf
         self.delta = delta
         self.dataset = dataset_name
 
@@ -82,16 +82,20 @@ class Solver(object):
                                               mode='thre',
                                               dataset=self.dataset)
 
+        if torch.cuda.is_available():
+            self.device = torch.device("cuda:0")
+        elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+            self.device = torch.device("mps")
+        else:
+            self.device = torch.device("cpu")
+
         self.build_model()
-        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.criterion = nn.MSELoss()
 
     def build_model(self):
         self.model = AnomalyTransformer(win_size=self.win_size, enc_in=self.input_c, c_out=self.output_c, e_layers=3)
+        self.model.to(self.device)
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
-
-        if torch.cuda.is_available():
-            self.model.cuda()
 
     def vali(self, vali_loader):
         self.model.eval()
@@ -207,7 +211,8 @@ class Solver(object):
     def test(self):
         self.model.load_state_dict(
             torch.load(
-                os.path.join(str(self.model_save_path), str(self.dataset) + '_checkpoint.pth')))
+                os.path.join(str(self.model_save_path), str(self.dataset) + '_checkpoint.pth'),
+                map_location=self.device))
         self.model.eval()
         temperature = 50
 
