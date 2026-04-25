@@ -1,0 +1,317 @@
+----- SMD -----
+
+rob@rob-B450M-DS3H-WIFI:~$ cd /home/rob/anomaly-transformer
+CUDA_VISIBLE_DEVICES=0 bash ./scripts/SMD.sh
+------------ Options -------------
+anormly_ratio: 0.5
+batch_size: 256
+data_path: dataset/SMD
+dataset: SMD
+input_c: 38
+k: 3
+lr: 0.0001
+mode: train
+model_save_path: checkpoints
+num_epochs: 10
+output_c: 38
+pretrained_model: None
+win_size: 100
+-------------- End ----------------
+======================TRAIN MODE======================
+Epoch: 1 cost time: 27.266273736953735
+Epoch: 1, Steps: 28 | Train Loss: -21.8663991 Vali Loss: -22.6509395 
+Validation loss decreased (inf --> -22.650939).  Saving model ...
+Updating learning rate to 0.0001
+Epoch: 2 cost time: 14.303977012634277
+Epoch: 2, Steps: 28 | Train Loss: -31.3053061 Vali Loss: -39.0349714 
+EarlyStopping counter: 1 out of 3
+Updating learning rate to 5e-05
+Epoch: 3 cost time: 14.297298431396484
+Epoch: 3, Steps: 28 | Train Loss: -42.0093291 Vali Loss: -42.4073266 
+EarlyStopping counter: 2 out of 3
+Updating learning rate to 2.5e-05
+Epoch: 4 cost time: 14.305132389068604
+Epoch: 4, Steps: 28 | Train Loss: -43.9196471 Vali Loss: -43.2143996 
+EarlyStopping counter: 3 out of 3
+Early stopping
+------------ Options -------------
+anormly_ratio: 0.5
+batch_size: 256
+data_path: dataset/SMD
+dataset: SMD
+input_c: 38
+k: 3
+lr: 0.0001
+mode: test
+model_save_path: checkpoints
+num_epochs: 10
+output_c: 38
+pretrained_model: 20
+win_size: 100
+-------------- End ----------------
+======================TEST MODE======================
+/home/rob/.local/lib/python3.10/site-packages/torch/nn/modules/loss.py:44: UserWarning: size_average and reduce args will be deprecated, please use reduction='none' instead.
+  self.reduction: str = _Reduction.legacy_get_string(size_average, reduce)
+Threshold : 0.11751296833156397
+pred:    (708400,)
+gt:      (708400,)
+pred:  (708400,)
+gt:    (708400,)
+Accuracy : 0.9920, Precision : 0.8887, Recall : 0.9224, F-score : 0.9052
+
+
+----- MSL -----
+
+rob@rob-B450M-DS3H-WIFI:~/anomaly-transformer$ cd /home/rob/anomaly-transformer
+bash ./scripts/MSL.sh
+------------ Options -------------
+anormly_ratio: 1.0
+batch_size: 256
+data_path: dataset/MSL
+dataset: MSL
+input_c: 55
+k: 3
+lr: 0.0001
+mode: train
+model_save_path: checkpoints
+num_epochs: 3
+output_c: 55
+pretrained_model: None
+win_size: 100
+-------------- End ----------------
+test: (73729, 55)
+train: (58317, 55)
+test: (73729, 55)
+train: (58317, 55)
+test: (73729, 55)
+train: (58317, 55)
+test: (73729, 55)
+train: (58317, 55)
+======================TRAIN MODE======================
+	speed: 0.5747s/iter; left time: 336.2197s
+	speed: 0.5266s/iter; left time: 255.4143s
+Epoch: 1 cost time: 126.43060994148254
+Epoch: 1, Steps: 228 | Train Loss: -42.2594778 Vali Loss: -45.5962801 
+Validation loss decreased (inf --> -45.596280).  Saving model ...
+Updating learning rate to 0.0001
+	speed: 1.1142s/iter; left time: 397.7810s
+	speed: 0.5267s/iter; left time: 135.3674s
+Epoch: 2 cost time: 119.63594794273376
+Epoch: 2, Steps: 228 | Train Loss: -47.6239775 Vali Loss: -46.1538102 
+EarlyStopping counter: 1 out of 3
+Updating learning rate to 5e-05
+	speed: 1.0924s/iter; left time: 140.9226s
+	speed: 0.5265s/iter; left time: 15.2678s
+Epoch: 3 cost time: 119.57814073562622
+Epoch: 3, Steps: 228 | Train Loss: -47.9017622 Vali Loss: -46.3280152 
+EarlyStopping counter: 2 out of 3
+Updating learning rate to 2.5e-05
+------------ Options -------------
+anormly_ratio: 1.0
+batch_size: 256
+data_path: dataset/MSL
+dataset: MSL
+input_c: 55
+k: 3
+lr: 0.0001
+mode: test
+model_save_path: checkpoints
+num_epochs: 10
+output_c: 55
+pretrained_model: 20
+win_size: 100
+-------------- End ----------------
+test: (73729, 55)
+train: (58317, 55)
+test: (73729, 55)
+train: (58317, 55)
+test: (73729, 55)
+train: (58317, 55)
+test: (73729, 55)
+train: (58317, 55)
+======================TEST MODE======================
+/home/rob/.local/lib/python3.10/site-packages/torch/nn/modules/loss.py:44: UserWarning: size_average and reduce args will be deprecated, please use reduction='none' instead.
+  self.reduction: str = _Reduction.legacy_get_string(size_average, reduce)
+Threshold : 0.005197591185569596
+pred:    (73700,)
+gt:      (73700,)
+pred:  (73700,)
+gt:    (73700,)
+Accuracy : 0.9868, Precision : 0.9185, Recall : 0.9603, F-score : 0.9389 
+
+
+
+---- SMAP ----
+rob@rob-B450M-DS3H-WIFI:~/anomaly-transformer$ CUDA_VISIBLE_DEVICES=0 bash ./scripts/SMAP.sh
+------------ Options -------------
+anormly_ratio: 1.0
+batch_size: 256
+data_path: dataset/SMAP
+dataset: SMAP
+input_c: 25
+k: 3
+lr: 0.0001
+mode: train
+model_save_path: checkpoints
+num_epochs: 3
+output_c: 25
+pretrained_model: None
+win_size: 100
+-------------- End ----------------
+test: (427617, 25)
+train: (135183, 25)
+test: (427617, 25)
+train: (135183, 25)
+test: (427617, 25)
+train: (135183, 25)
+test: (427617, 25)
+train: (135183, 25)
+======================TRAIN MODE======================
+	speed: 0.5694s/iter; left time: 845.5088s
+	speed: 0.5240s/iter; left time: 725.7265s
+	speed: 0.5229s/iter; left time: 671.9829s
+	speed: 0.5229s/iter; left time: 619.6269s
+	speed: 0.5230s/iter; left time: 567.4850s
+Epoch: 1 cost time: 283.4146056175232
+Epoch: 1, Steps: 528 | Train Loss: -44.5154799 Vali Loss: -47.1301075 
+Validation loss decreased (inf --> -47.130108).  Saving model ...
+Updating learning rate to 0.0001
+	speed: 3.1020s/iter; left time: 2968.5967s
+	speed: 0.5229s/iter; left time: 448.1366s
+	speed: 0.5231s/iter; left time: 395.9720s
+	speed: 0.5230s/iter; left time: 343.6074s
+	speed: 0.5230s/iter; left time: 291.3114s
+Epoch: 2 cost time: 275.7871265411377
+Epoch: 2, Steps: 528 | Train Loss: -47.8639943 Vali Loss: -47.7709674 
+EarlyStopping counter: 1 out of 3
+Updating learning rate to 5e-05
+	speed: 3.0670s/iter; left time: 1315.7545s
+	speed: 0.5223s/iter; left time: 171.8237s
+	speed: 0.5199s/iter; left time: 119.0499s
+	speed: 0.5199s/iter; left time: 67.0658s
+	speed: 0.5199s/iter; left time: 15.0784s
+Epoch: 3 cost time: 274.6733329296112
+Epoch: 3, Steps: 528 | Train Loss: -48.1592994 Vali Loss: -47.8979617 
+EarlyStopping counter: 2 out of 3
+Updating learning rate to 2.5e-05
+------------ Options -------------
+anormly_ratio: 1.0
+batch_size: 256
+data_path: dataset/SMAP
+dataset: SMAP
+input_c: 25
+k: 3
+lr: 0.0001
+mode: test
+model_save_path: checkpoints
+num_epochs: 10
+output_c: 25
+pretrained_model: 20
+win_size: 100
+-------------- End ----------------
+test: (427617, 25)
+train: (135183, 25)
+test: (427617, 25)
+train: (135183, 25)
+test: (427617, 25)
+train: (135183, 25)
+test: (427617, 25)
+train: (135183, 25)
+======================TEST MODE======================
+/home/rob/.local/lib/python3.10/site-packages/torch/nn/modules/loss.py:44: UserWarning: size_average and reduce args will be deprecated, please use reduction='none' instead.
+  self.reduction: str = _Reduction.legacy_get_string(size_average, reduce)
+Threshold : 0.0041664680512622
+pred:    (427600,)
+gt:      (427600,)
+pred:  (427600,)
+gt:    (427600,)
+Accuracy : 0.9906, Precision : 0.9373, Recall : 0.9932, F-score : 0.9645 
+
+
+
+----- PSM -----
+
+rob@rob-B450M-DS3H-WIFI:~/anomaly-transformer$ CUDA_VISIBLE_DEVICES=0 bash ./scripts/PSM.sh
+------------ Options -------------
+anormly_ratio: 1.0
+batch_size: 256
+data_path: dataset/PSM
+dataset: PSM
+input_c: 25
+k: 3
+lr: 0.0001
+mode: train
+model_save_path: checkpoints
+num_epochs: 3
+output_c: 25
+pretrained_model: None
+win_size: 100
+-------------- End ----------------
+test: (87841, 25)
+train: (132481, 25)
+test: (87841, 25)
+train: (132481, 25)
+test: (87841, 25)
+train: (132481, 25)
+test: (87841, 25)
+train: (132481, 25)
+======================TRAIN MODE======================
+	speed: 0.5731s/iter; left time: 833.8823s
+	speed: 0.5230s/iter; left time: 708.7027s
+	speed: 0.5232s/iter; left time: 656.6471s
+	speed: 0.5233s/iter; left time: 604.4048s
+	speed: 0.5234s/iter; left time: 552.1734s
+Epoch: 1 cost time: 276.3585457801819
+Epoch: 1, Steps: 518 | Train Loss: -44.9152720 Vali Loss: -47.9139586 
+Validation loss decreased (inf --> -47.913959).  Saving model ...
+Updating learning rate to 0.0001
+	speed: 1.1194s/iter; left time: 1048.8593s
+	speed: 0.5228s/iter; left time: 437.5968s
+	speed: 0.5228s/iter; left time: 385.3262s
+	speed: 0.5229s/iter; left time: 333.0763s
+	speed: 0.5227s/iter; left time: 280.7024s
+Epoch: 2 cost time: 270.29814553260803
+Epoch: 2, Steps: 518 | Train Loss: -48.2991920 Vali Loss: -48.4673308 
+EarlyStopping counter: 1 out of 3
+Updating learning rate to 5e-05
+	speed: 1.1072s/iter; left time: 463.9160s
+	speed: 0.5227s/iter; left time: 166.7462s
+	speed: 0.5228s/iter; left time: 114.4923s
+	speed: 0.5227s/iter; left time: 62.2006s
+	speed: 0.5229s/iter; left time: 9.9359s
+Epoch: 3 cost time: 270.27108812332153
+Epoch: 3, Steps: 518 | Train Loss: -48.6775325 Vali Loss: -48.6627237 
+EarlyStopping counter: 2 out of 3
+Updating learning rate to 2.5e-05
+------------ Options -------------
+anormly_ratio: 1.0
+batch_size: 256
+data_path: dataset/PSM
+dataset: PSM
+input_c: 25
+k: 3
+lr: 0.0001
+mode: test
+model_save_path: checkpoints
+num_epochs: 10
+output_c: 25
+pretrained_model: 20
+win_size: 100
+-------------- End ----------------
+test: (87841, 25)
+train: (132481, 25)
+test: (87841, 25)
+train: (132481, 25)
+test: (87841, 25)
+train: (132481, 25)
+test: (87841, 25)
+train: (132481, 25)
+======================TEST MODE======================
+/home/rob/.local/lib/python3.10/site-packages/torch/nn/modules/loss.py:44: UserWarning: size_average and reduce args will be deprecated, please use reduction='none' instead.
+  self.reduction: str = _Reduction.legacy_get_string(size_average, reduce)
+Threshold : 0.0037621216033585096
+pred:    (87800,)
+gt:      (87800,)
+pred:  (87800,)
+gt:    (87800,)
+Accuracy : 0.9883, Precision : 0.9732, Recall : 0.9849, F-score : 0.9790 
