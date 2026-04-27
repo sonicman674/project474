@@ -132,3 +132,5 @@ dmypy.json
 dataset/
 
 /checkpoints/
+/project474/
+/anomaly_data/
