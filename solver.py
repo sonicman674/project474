@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 import os
+import csv
 import time
 from utils.utils import *
 from model.AnomalyTransformer import AnomalyTransformer
@@ -141,6 +142,12 @@ class Solver(object):
             os.makedirs(path)
         early_stopping = EarlyStopping(patience=3, verbose=True, dataset_name=self.dataset)
         train_steps = len(self.train_loader)
+        training_log_path = getattr(self, 'training_log_path', 'training_logs')
+        os.makedirs(training_log_path, exist_ok=True)
+        training_log_file = os.path.join(training_log_path, f'{self.dataset}_training_log.csv')
+        with open(training_log_file, 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(['epoch', 'train_loss', 'vali_loss', 'vali_loss2', 'early_stop'])
 
         for epoch in range(self.num_epochs):
             iter_count = 0
@@ -203,10 +210,20 @@ class Solver(object):
                 "Epoch: {0}, Steps: {1} | Train Loss: {2:.7f} Vali Loss: {3:.7f} ".format(
                     epoch + 1, train_steps, train_loss, vali_loss1))
             early_stopping(vali_loss1, vali_loss2, self.model, path)
+            with open(training_log_file, 'a', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow([
+                    epoch + 1,
+                    train_loss,
+                    vali_loss1,
+                    vali_loss2,
+                    int(early_stopping.early_stop),
+                ])
             if early_stopping.early_stop:
                 print("Early stopping")
                 break
             adjust_learning_rate(self.optimizer, epoch + 1, self.lr)
+        print(f"Saved training log → {training_log_file}")
 
     def test(self):
         self.model.load_state_dict(
@@ -336,6 +353,7 @@ class Solver(object):
         pred = (test_energy > thresh).astype(int)
 
         gt = test_labels.astype(int)
+        raw_pred = pred.copy()
 
         print("pred:   ", pred.shape)
         print("gt:     ", gt.shape)
@@ -376,5 +394,22 @@ class Solver(object):
             "Accuracy : {:0.4f}, Precision : {:0.4f}, Recall : {:0.4f}, F-score : {:0.4f} ".format(
                 accuracy, precision,
                 recall, f_score))
+
+        score_save_path = getattr(self, 'score_save_path', 'test_outputs')
+        os.makedirs(score_save_path, exist_ok=True)
+        output_path = os.path.join(score_save_path, f'{self.dataset}_test_outputs.npz')
+        np.savez(
+            output_path,
+            score=test_energy,
+            threshold=thresh,
+            raw_pred=raw_pred,
+            pred=pred,
+            gt=gt,
+            accuracy=accuracy,
+            precision=precision,
+            recall=recall,
+            f_score=f_score,
+        )
+        print(f"Saved test outputs → {output_path}")
 
         return accuracy, precision, recall, f_score
