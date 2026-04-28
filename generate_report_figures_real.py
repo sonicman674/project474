@@ -25,6 +25,13 @@ import matplotlib.gridspec as gridspec
 import matplotlib.ticker as ticker
 from matplotlib.lines import Line2D
 from matplotlib.colors import LinearSegmentedColormap
+from sklearn.metrics import (
+    auc,
+    average_precision_score,
+    precision_recall_curve,
+    precision_recall_fscore_support,
+    roc_curve,
+)
 
 matplotlib.rcParams.update({
     'font.family': 'sans-serif',
@@ -435,6 +442,29 @@ def compute_cm_from_outputs(name):
     TP = int(((gt == 1) & (pred == 1)).sum())
     return np.array([[TN,FP],[FN,TP]])
 
+
+def point_adjust_predictions(gt, pred):
+    """Apply the standard point-adjustment used by Anomaly Transformer evaluation."""
+    adjusted = pred.astype(int).copy()
+    gt = gt.astype(int)
+    anomaly_state = False
+    for i in range(len(gt)):
+        if gt[i] == 1 and adjusted[i] == 1 and not anomaly_state:
+            anomaly_state = True
+            for j in range(i, 0, -1):
+                if gt[j] == 0:
+                    break
+                adjusted[j] = 1
+            for j in range(i, len(gt)):
+                if gt[j] == 0:
+                    break
+                adjusted[j] = 1
+        elif gt[i] == 0:
+            anomaly_state = False
+        if anomaly_state:
+            adjusted[i] = 1
+    return adjusted
+
 def fig6_confusion_matrices():
     results = real_results()
     fig, axes = plt.subplots(1, 4, figsize=(13.8, 4.4))
@@ -593,94 +623,112 @@ def fig8_detection_overlay():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# FIGURE 9  —  Baseline comparison
+# FIGURE 9  —  ROC and Precision-Recall curves
 # ─────────────────────────────────────────────────────────────────────────────
-def fig9_baseline_comparison():
-    skab_methods = ['Isolation\nForest','LSTM-AD','OmniAnomaly','THOC','Anomaly\nTransformer']
-    skab_f1      = [76.40, 81.22, 88.30, 91.50, 98.93]
-    mit_methods  = ['Autoencoder','LSTM-AD','BeatGAN','OmniAnomaly','Anomaly\nTransformer']
-    mit_f1       = [72.10, 79.50, 84.30, 88.60, 92.88]
+def fig9_roc_pr_curves():
+    fig, axes = plt.subplots(2, 4, figsize=(14.4, 7.2))
+    for col, (name, res) in enumerate(RESULTS.items()):
+        out = load_model_outputs(name)
+        gt = out['gt'].astype(int)
+        score = out['score'].astype(float)
 
-    fig, axes = plt.subplots(1, 2, figsize=(12.6, 5.4))
-    for ax, (methods, f1s, title) in zip(axes, [
-        (skab_methods, skab_f1, 'SKAB — Industrial Pump/Valve Fault Detection'),
-        (mit_methods,  mit_f1,  'MIT-BIH — ECG Arrhythmia Detection'),
-    ]):
-        colors = ['#5b7fbe']*(len(methods)-1)+['#c44e52']
-        bars = ax.bar(methods, f1s, color=colors, alpha=0.88, width=0.60, zorder=3)
-        for bar, v in zip(bars, f1s):
-            ax.text(bar.get_x()+bar.get_width()/2, bar.get_height()+0.6,
-                    f'{v:.2f}%', ha='center', va='bottom', fontsize=9, fontweight='bold')
-        bars[-1].set_edgecolor('#8B0000'); bars[-1].set_linewidth(1.5)
-        ax.set_ylabel('F1-score (%)'); ax.set_title(title, fontsize=11, pad=8)
-        ax.set_ylim(50, 108)
-        ax.yaxis.grid(True, linestyle='--', lw=0.5, alpha=0.6, zorder=0)
-        ax.set_axisbelow(True); ax.spines[['top','right']].set_visible(False)
-        ax.tick_params(axis='x', labelsize=9)
-    fig.suptitle('Part 6 — F1-Score Comparison: Anomaly Transformer vs Baselines  (Colab T4)\n'
-                 'SKAB (industrial) and MIT-BIH (biomedical)',
+        fpr, tpr, _ = roc_curve(gt, score)
+        roc_auc = auc(fpr, tpr)
+        precision, recall, _ = precision_recall_curve(gt, score)
+        avg_precision = average_precision_score(gt, score)
+
+        ax_roc = axes[0, col]
+        ax_pr = axes[1, col]
+
+        ax_roc.plot(fpr, tpr, color=res['color'], lw=1.8,
+                    label=f'AUC = {roc_auc:.3f}')
+        ax_roc.plot([0, 1], [0, 1], color='#999999', lw=0.8, linestyle='--')
+        ax_roc.set_title(name, fontsize=11)
+        ax_roc.set_xlabel('False positive rate')
+        ax_roc.set_ylabel('True positive rate')
+        ax_roc.set_xlim(0, 1)
+        ax_roc.set_ylim(0, 1.03)
+        ax_roc.grid(True, linestyle='--', lw=0.4, alpha=0.5)
+        ax_roc.spines[['top', 'right']].set_visible(False)
+        ax_roc.legend(frameon=False, fontsize=8, loc='lower right')
+
+        ax_pr.plot(recall, precision, color=res['color'], lw=1.8,
+                   label=f'AP = {avg_precision:.3f}')
+        ax_pr.axhline(gt.mean(), color='#999999', lw=0.8, linestyle='--',
+                      label=f'Base = {gt.mean():.3f}')
+        ax_pr.set_xlabel('Recall')
+        ax_pr.set_ylabel('Precision')
+        ax_pr.set_xlim(0, 1)
+        ax_pr.set_ylim(0, 1.03)
+        ax_pr.grid(True, linestyle='--', lw=0.4, alpha=0.5)
+        ax_pr.spines[['top', 'right']].set_visible(False)
+        ax_pr.legend(frameon=False, fontsize=8, loc='lower left')
+
+    fig.suptitle('Part 6 — Raw Point-Wise ROC and Precision-Recall Curves\n'
+                 'Computed before point adjustment; event-level F1 is reported separately',
                  fontsize=12, fontweight='bold', y=0.985)
-    fig.legend(handles=[
-        mpatches.Patch(facecolor='#5b7fbe',alpha=0.88,label='Baseline methods'),
-        mpatches.Patch(facecolor='#c44e52',alpha=0.88,label='Anomaly Transformer (ours)'),
-    ], loc='lower center', ncol=2, frameon=False, fontsize=10, bbox_to_anchor=(0.5,0.02))
-    plt.tight_layout(rect=[0,0.10,1,0.90], w_pad=2.4)
-    save('fig9_baseline_comparison')
+    plt.tight_layout(rect=[0, 0.02, 1, 0.92], h_pad=2.0, w_pad=2.0)
+    save('fig9_roc_pr_curves')
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# FIGURE 10  —  Side-by-side comparison: local run vs Colab T4 run
+# FIGURE 10  —  Threshold sensitivity
 # ─────────────────────────────────────────────────────────────────────────────
-def fig10_local_vs_colab():
-    """Highlights the improvement — especially GECCO fixed on Colab."""
-    local = {'SKAB':98.87,'TEP':99.82,'GECCO':0.00,'MIT-BIH':92.90}
-    colab = {'SKAB':98.93,'TEP':99.82,'GECCO':98.72,'MIT-BIH':92.88}
+def fig10_threshold_sensitivity():
+    ratios = np.array([0.001, 0.002, 0.005, 0.01, 0.02, 0.05,
+                       0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 20.0])
+    fig, axes = plt.subplots(1, 4, figsize=(14.4, 4.4), sharey=True)
 
-    x = np.arange(len(DATASETS)); width = 0.35
-    fig, ax = plt.subplots(figsize=(10, 5.8))
-    bars_l = ax.bar(x - width/2, [local[d] for d in DATASETS], width,
-                    label='Local run (CPU)', color='#aec7e8', alpha=0.88,
-                    edgecolor='#1f77b4', linewidth=0.8, zorder=3)
-    bars_c = ax.bar(x + width/2, [colab[d] for d in DATASETS], width,
-                    label='Colab T4 (definitive)', color='#c44e52', alpha=0.88,
-                    edgecolor='#8B0000', linewidth=0.8, zorder=3)
+    for ax, (name, res) in zip(axes, RESULTS.items()):
+        out = load_model_outputs(name)
+        gt = out['gt'].astype(int)
+        score = out['score'].astype(float)
+        f1_values = []
+        precision_values = []
+        recall_values = []
 
-    for bar, v in zip(bars_l, [local[d] for d in DATASETS]):
-        if v > 2:
-            ax.text(bar.get_x()+bar.get_width()/2, bar.get_height()+0.5,
-                    f'{v:.2f}', ha='center', va='bottom', fontsize=8.5)
-        else:
-            ax.text(bar.get_x()+bar.get_width()/2, 2.5,
-                    'FAIL', ha='center', va='bottom', fontsize=8, color='#b22222',
-                    fontweight='bold')
-    for bar, v in zip(bars_c, [colab[d] for d in DATASETS]):
-        ax.text(bar.get_x()+bar.get_width()/2, bar.get_height()+0.5,
-                f'{v:.2f}', ha='center', va='bottom', fontsize=8.5, fontweight='bold',
-                color='#8B0000')
+        for ratio in ratios:
+            threshold = np.percentile(score, 100 - ratio)
+            pred = (score > threshold).astype(int)
+            pred = point_adjust_predictions(gt, pred)
+            precision, recall, f1, _ = precision_recall_fscore_support(
+                gt, pred, average='binary', zero_division=0)
+            precision_values.append(precision * 100)
+            recall_values.append(recall * 100)
+            f1_values.append(f1 * 100)
 
-    ax.set_xticks(x); ax.set_xticklabels(DATASETS, fontsize=11)
-    ax.set_ylabel('F1-score (%)')
-    ax.set_title('Local Run vs Colab T4 — F1-Score Comparison\n'
-                 'Key difference: GECCO threshold calibration fixed on Colab (GPU precision)',
-                 pad=10)
-    ax.set_ylim(0, 112)
-    ax.yaxis.grid(True, linestyle='--', lw=0.55, alpha=0.6, zorder=0)
-    ax.set_axisbelow(True); ax.spines[['top','right']].set_visible(False)
-    ax.legend(frameon=False, fontsize=10, loc='upper center',
-              bbox_to_anchor=(0.5, -0.12), ncol=2)
+        best_idx = int(np.argmax(f1_values))
+        ax.plot(ratios, f1_values, color=res['color'], lw=1.8,
+                marker='o', ms=4, label='F1')
+        ax.plot(ratios, precision_values, color='#1f77b4', lw=1.0,
+                linestyle='--', alpha=0.7, label='Precision')
+        ax.plot(ratios, recall_values, color='#ff7f0e', lw=1.0,
+                linestyle=':', alpha=0.85, label='Recall')
+        ax.scatter([ratios[best_idx]], [f1_values[best_idx]], s=45,
+                   color='#222222', zorder=4)
+        ax.text(ratios[best_idx], min(104, f1_values[best_idx] + 4),
+                f'best {f1_values[best_idx]:.1f}%',
+                ha='center', va='bottom', fontsize=7.6)
+        ax.axvline(RESULTS[name]['anomaly_rate'] * 100, color='#888888',
+                   linestyle='-.', lw=0.9, alpha=0.75,
+                   label='True anomaly rate')
+        ax.set_xscale('log')
+        ax.set_title(name, fontsize=11)
+        ax.set_xlabel('Threshold anomaly ratio r (%)')
+        ax.set_ylim(0, 108)
+        ax.grid(True, linestyle='--', lw=0.4, alpha=0.5)
+        ax.spines[['top', 'right']].set_visible(False)
+        if ax is axes[0]:
+            ax.set_ylabel('Score (%)')
 
-    # Arrow annotation for GECCO improvement
-    gecco_i = DATASETS.index('GECCO')
-    ax.annotate('GECCO fixed\non Colab',
-                xy=(gecco_i + width/2, colab['GECCO']),
-                xytext=(gecco_i - 0.35, 58),
-                ha='center', va='center', fontsize=9, color='#006400',
-                fontweight='bold',
-                arrowprops=dict(arrowstyle='->', color='#006400', lw=1.6,
-                                shrinkA=4, shrinkB=4))
-
-    plt.tight_layout(rect=[0,0.12,1,0.92])
-    save('fig10_local_vs_colab_comparison')
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc='lower center', ncol=4,
+               frameon=False, fontsize=9, bbox_to_anchor=(0.5, 0.02))
+    fig.suptitle('Part 6 — Threshold Sensitivity from Saved Model Scores\n'
+                 'F1 changes as the selected anomaly-ratio threshold r is varied',
+                 fontsize=12, fontweight='bold', y=0.98)
+    plt.tight_layout(rect=[0, 0.12, 1, 0.88], w_pad=1.8)
+    save('fig10_threshold_sensitivity')
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -710,17 +758,18 @@ if __name__ == '__main__':
     except FileNotFoundError as exc:
         print(f'  Skipped fig7_training_convergence: {exc}')
         print('  Create training_logs/*.csv by rerunning train mode with the updated solver.py.')
-    print('\n[8/9] Figure 8 — Real model detection overlay...')
+    print('\n[8/10] Figure 8 — Real model detection overlay...')
     try:
         fig8_detection_overlay()
     except FileNotFoundError as exc:
         print(f'  Skipped fig8_detection_overlay: {exc}')
         print('  Create test_outputs/*.npz by rerunning test mode with the updated solver.py.')
-    print('\n[9/9] Figure 9 — Baseline comparison skipped.')
-    print('  Figure 9 requires cited external baseline results, not model-output files.')
+    print('\n[9/10] Figure 9 — ROC and PR curves...')
+    fig9_roc_pr_curves()
+    print('\n[10/10] Figure 10 — Threshold sensitivity...')
+    fig10_threshold_sensitivity()
 
     print('\n' + '=' * 65)
-    print('Done. Figures 1, 2, 3, 5, 6, and 8 use saved model outputs.')
+    print('Done. Figures 1, 2, 3, 5, 6, 8, 9, and 10 use saved model outputs.')
     print('Figure 7 uses training_logs/*.csv when those files exist.')
-    print('Figure 9 and Figure 10 are intentionally not generated for the report.')
     print('=' * 65)
