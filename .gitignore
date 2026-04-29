@@ -134,3 +134,9 @@ dataset/
 /checkpoints/
 /project474/
 /anomaly_data/
+/training_logs/
+/test_outputs/
+/report_figures_real/
+/report_figures/
+/REPORTFIGURES/
+/report_outputs_latest/
